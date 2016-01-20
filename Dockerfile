@@ -1,20 +1,23 @@
 FROM ubuntu
 
-RUN apt-get update -y
-RUN apt-get upgrade -y
+RUN             apt-get update -qq
 
-RUN apt-get install -y libcurl4-openssl-dev libncurses5-dev pkg-config automake yasm git build-essential wget libtool autogen
-RUN wget https://github.com/ckolivas/cgminer/tarball/v2.11.4
-RUN mkdir cgminer
-RUN tar zxvf v2.11.4 --directory cgminer
-RUN cd ./cgminer/ckolivas-cgminer-* \
-    && ./autogen.sh --disable-opencl --disable-adl --enable-cpumining \
-    && CFLAGS="-O3" ./configure --disable-opencl --disable-adl --enable-cpumining \
-    && make
-    
-WORKDIR ./cgminer/ckolivas-cgminer-96c8ff5
+RUN             apt-get install -qqy automake
+RUN             apt-get install -qqy libcurl4-openssl-dev
+RUN             apt-get install -qqy git
+RUN             apt-get install -qqy make
 
+RUN git config --global http.sslVerify false
+RUN             git clone https://github.com/pooler/cpuminer
+
+RUN             cd cpuminer && ./autogen.sh
+RUN apt-get install  -qqy build-essential
+RUN             cd cpuminer && ./configure CFLAGS="-O3"
+RUN             cd cpuminer && make
+
+WORKDIR         /cpuminer
+ENV TYPE scrypt
 ENV USER user
-ENV PASS pass
-ENV URL stratum+tcp://stratum.bitcoin.cz:3333
-CMD ./cgminer --user=$USER --pass=$PASS --url=$URL
+ENV PASS 0
+ENV URL stratum+tcp://gld.hashfaster.com:3336
+ENTRYPOINT ./minerd  -a $TYPE  --url=$URL --userpass=$USER:$PASS
