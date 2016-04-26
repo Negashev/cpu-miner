@@ -19,5 +19,5 @@ WORKDIR         /cpuminer
 ENV TYPE scrypt
 ENV USER user
 ENV PASS 0
-ENV URL stratum+tcp://gld.hashfaster.com:3336
+ENV URL stratum+tcp://stratum.hashfaster.com:3333
 ENTRYPOINT ./minerd  -a $TYPE  --url=$URL --userpass=$USER:$PASS
